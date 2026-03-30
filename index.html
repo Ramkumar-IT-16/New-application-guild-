@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVK ROWDYS - Guild Portal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #ff9999, #ffeb99);
+            position: relative;
+        }
+
+        .bg-shape {
+            position: absolute;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            background: rgba(255, 255, 255, 0.2);
+            animation: morph 8s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+
+        .shape1 { width: 400px; height: 400px; top: -100px; left: -100px; background: rgba(255, 100, 100, 0.15); }
+        .shape2 { width: 500px; height: 500px; bottom: -150px; right: -150px; background: rgba(255, 220, 100, 0.2); animation-duration: 12s; }
+
+        @keyframes morph {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            100% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+        }
+
+        .container {
+            width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        h1 { color: #cc3333; margin-bottom: 5px; font-size: 28px; }
+        h2 { color: #555; font-size: 16px; margin-bottom: 20px; }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .menu-btn {
+            display: block; width: 100%; padding: 15px; margin: 15px 0;
+            border: none; border-radius: 50px; background: #fff;
+            color: #333; font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+        .menu-btn:nth-child(1) { animation-delay: 0s; }
+        .menu-btn:nth-child(2) { animation-delay: 0.5s; }
+        .menu-btn:nth-child(3) { animation-delay: 1s; }
+        .menu-btn:nth-child(4) { animation-delay: 1.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .menu-btn:hover { transform: scale(1.03); background: #fffae6; }
+
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; }
+        
+        .submit-btn {
+            width: 100%; padding: 12px; margin-top: 10px; border: none;
+            border-radius: 8px; background: #cc3333; color: white;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+        .submit-btn:hover { background: #aa2222; }
+        .back-btn { background: #aaa; }
+        .back-btn:hover { background: #888; }
+
+        .rules-box { text-align: left; background: #fff5e6; padding: 12px; border-radius: 8px; margin: 10px 0; font-size: 12px; color: #666; }
+
+        .app-card {
+            background: #f9f9f9; padding: 12px; border-radius: 8px;
+            margin-top: 10px; text-align: left; border: 1px solid #eee;
+        }
+        .action-btn {
+            padding: 6px 12px; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: bold; margin-right: 5px; margin-top: 5px;
+        }
+        .btn-approve { background: #28a745; color: white; }
+        .btn-reject { background: #dc3545; color: white; }
+        .btn-remove { background: #ff4d4d; color: white; float: right; font-size: 11px; padding: 4px 8px; }
+        .btn-remove:hover { background: #cc0000; }
+
+        .status-badge { display: inline-block; padding: 10px 20px; border-radius: 20px; font-weight: bold; margin-top: 15px; }
+        .pending { background: #ffe699; color: #8a6d3b; }
+        .approved { background: #d4edda; color: #155724; }
+        .rejected { background: #f8d7da; color: #721c24; }
+
+        .confirm-box {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .member-item {
+            background: #e6f4ea;
+            color: #137333;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            text-align: left;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
+    <div class="container">
+        <h1>TVK ROWDYS</h1>
+        <h2 id="sub-title">GUILD PORTAL</h2>
+        <hr style="border:0; height:1px; background:#eee; margin-bottom:20px;">
+
+        <div id="page-main" class="page active">
+            <button class="menu-btn" onclick="showPage('page-apply')">1. New Application</button>
+            <button class="menu-btn" onclick="showPage('page-members')">2. Member List</button>
+            <button class="menu-btn" onclick="showPage('page-admin')">3. Admin Login</button>
+            <button class="menu-btn" onclick="showPage('page-status')">4. Application Status</button>
+        </div>
+
+        <div id="page-apply" class="page">
+            <input type="text" id="app-uid" placeholder="Game UID">
+            <input type="text" id="app-name" placeholder="Game Name">
+            <input type="text" id="app-level" placeholder="Game Level">
+            <input type="text" id="app-insta" placeholder="Instagram ID">
+            <input type="password" id="app-pass" placeholder="Create Password">
+            
+            <p style="color:#cc3333; font-size:12px;">Only enter valid details!</p>
+            
+            <div class="rules-box">
+                <strong>Rules:</strong><br>
+                1. Don't insult other guild mates.<br>
+                2. Don't involve your personal in our guild.<br>
+                3. Active player only ("valid reason applicable").<br>
+                4. Enter your details correctly.
+            </div>
+
+            <button class="submit-btn" onclick="submitApplication()">Apply Now</button>
+            <button class="submit-btn back-btn" onclick="showPage('page-main')">Back</button>
+        </div>
+
+        <div id="page-success" class="page">
+            <div style="color: #28a745; font-size: 40px; margin-bottom: 10px;">✔</div>
+            <h3 style="color: #333; margin-bottom: 10px;" id="greeting-player"></h3>
+            
+            <div class="confirm-box">
+                <p style="font-weight: bold; color: #555; border-bottom: 1px solid #91d5ff; padding-bottom: 5px; margin-bottom: 10px;">Your Submitted Details:</p>
+                <p><strong>Game UID:</strong> <span id="lbl-uid"></span></p>
+                <p><strong>Game Name:</strong> <span id="lbl-name"></span></p>
+                <p><strong>Game Level:</strong> <span id="lbl-level"></span></p>
+                <p><strong>Insta ID:</strong> <span id="lbl-insta"></span></p>
+            </div>
+
+            <p style="color: #555; font-size: 14px; margin-bottom: 15px;">Thanks for applying to our guild! Your profile has been successfully forwarded to our 6 Admin profiles.</p>
+            
+            <button class="submit-btn" onclick="showPage('page-main')">Go to Main Menu</button>
+        </div>
+
+        <div id="page-members" class="page">
+            <h3 style="color:#555; font-size:16px; margin-bottom:15px;">Official Approved Members</h3>
+            
+            <div id="approved-member-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
+                <p style="color:#aaa; font-size:12px;">No approved members yet.</p>
+            </div>
+
+            <button class="submit-btn back-btn" onclick="showPage('page-main')">Back</button>
+        </div>
+
+        <div id="page-admin" class="page">
+            <div id="admin-login-form">
+                <select id="admin-role">
+                    <option value="">Select Admin Role</option>
+                    <option value="Leader">Leader</option>
+                    <option value="Active Leader">Active Leader</option>
+                    <option value="Officer 1">Officer 1</option>
+                    <option value="Officer 2">Officer 2</option>
+                    <option value="Officer 3">Officer 3</option>
+                    <option value="Officer 4">Officer 4</option>
+                </select>
+                <input type="password" id="admin-pass" placeholder="Enter Admin Password">
+                <button class="submit-btn" onclick="checkAdminLogin()">Admin Login</button>
+            </div>
+
+            <div id="admin-dashboard" style="display:none;">
+                <button class="submit-btn" onclick="showPage('page-members')" style="background:#007bff; margin-bottom: 15px;">Manage Current Members</button>
+                <h3 style="color:#555; margin-bottom:10px;">Pending Applications</h3>
+                <div id="app-list">No applications yet.</div>
+                <button class="submit-btn back-btn" onclick="logoutAdmin()" style="margin-top:20px;">Logout Admin</button>
+            </div>
+            
+            <button id="admin-back" class="submit-btn back-btn" onclick="showPage('page-main')">Back</button>
+        </div>
+
+        <div id="page-status" class="page">
+            <input type="text" id="status-uid" placeholder="Enter your Game UID to check">
+            <button class="submit-btn" onclick="checkStatus()">Check Status</button>
+            
+            <div id="status-result" style="display:none;">
+                <p style="margin-top:15px; font-size:14px;">Your Application Status:</p>
+                <div id="badge" class="status-badge pending">PENDING</div>
+            </div>
+            
+            <button class="submit-btn back-btn" onclick="showPage('page-main')">Back</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Track if an admin is currently logged in
+        let isAdminLoggedIn = false;
+
+        function getApps() { return JSON.parse(localStorage.getItem('guildApps')) || {}; }
+        function saveApps(apps) { localStorage.setItem('guildApps', JSON.stringify(apps)); }
+        function getMembers() { return JSON.parse(localStorage.getItem('guildMembers')) || []; }
+        function saveMembers(members) { localStorage.setItem('guildMembers', JSON.stringify(members)); }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            const titles = {
+                'page-main': 'GUILD PORTAL', 'page-apply': 'NEW APPLICATION',
+                'page-members': 'MEMBER LIST', 'page-admin': 'ADMIN PANEL', 
+                'page-status': 'CHECK STATUS', 'page-success': 'APPLICATION SENT!'
+            };
+            document.getElementById('sub-title').innerText = titles[pageId] || "TVK ROWDYS";
+
+            if(pageId === 'page-members') {
+                loadMemberDirectory();
+            }
+        }
+
+        // 1. Submit Application
+        function submitApplication() {
+            const uid = document.getElementById('app-uid').value;
+            const name = document.getElementById('app-name').value;
+            const level = document.getElementById('app-level').value;
+            const insta = document.getElementById('app-insta').value;
+            
+            if(!uid || !name || !level) { 
+                alert("Please fill in at least your UID, Name, and Level!"); 
+                return; 
+            }
+
+            let apps = getApps();
+            apps[uid] = { name: name, level: level, insta: insta, status: 'pending' };
+            saveApps(apps);
+
+            document.getElementById('greeting-player').innerText = "Welcome, Player " + name + "!";
+            document.getElementById('lbl-uid').innerText = uid;
+            document.getElementById('lbl-name').innerText = name;
+            document.getElementById('lbl-level').innerText = level;
+            document.getElementById('lbl-insta').innerText = insta || "Not provided";
+
+            document.getElementById('app-uid').value = '';
+            document.getElementById('app-name').value = '';
+            document.getElementById('app-level').value = '';
+            document.getElementById('app-insta').value = '';
+            document.getElementById('app-pass').value = '';
+
+            showPage('page-success');
+        }
+
+        // 2. Admin Login
+        function checkAdminLogin() {
+            const role = document.getElementById('admin-role').value;
+            const pass = document.getElementById('admin-pass').value;
+
+            const adminPasses = {
+                'Leader': '2578', 'Active Leader': '2711', 'Officer 1': '7122',
+                'Officer 2': '8255', 'Officer 3': '1805', 'Officer 4': '1608'
+            };
+
+            if (role && adminPasses[role] === pass) {
+                isAdminLoggedIn = true;
+                document.getElementById('admin-login-form').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                document.getElementById('admin-back').style.display = 'none';
+                document.getElementById('sub-title').innerText = "ADMIN ACTIVE: " + role.toUpperCase();
+                loadApplicationsForAdmin();
+            } else {
+                alert("Incorrect password or role not selected!");
+            }
+        }
+
+        function loadApplicationsForAdmin() {
+            const appListDiv = document.getElementById('app-list');
+            const apps = getApps();
+            appListDiv.innerHTML = '';
+
+            const keys = Object.keys(apps);
+            if (keys.length === 0) {
+                appListDiv.innerHTML = "<p style='color:#aaa;'>No applications found.</p>";
+                return;
+            }
+
+            keys.forEach(uid => {
+                const app = apps[uid];
+                const card = document.createElement('div');
+                card.className = 'app-card';
+                card.innerHTML = `
+                    <strong>Name:</strong> ${app.name}<br>
+                    <strong>UID:</strong> ${uid}<br>
+                    <strong>Level:</strong> ${app.level || 'N/A'}<br>
+                    <strong>Status:</strong> ${app.status.toUpperCase()}<br>
+                    <button class="action-btn btn-approve" onclick="handleApprove('${uid}')">Approve</button>
+                    <button class="action-btn btn-reject" onclick="handleReject('${uid}')">Reject</button>
+                `;
+                appListDiv.appendChild(card);
+            });
+        }
+
+        function handleApprove(uid) {
+            let apps = getApps();
+            let members = getMembers();
+
+            if (apps[uid]) {
+                members.push({ name: apps[uid].name, uid: uid });
+                saveMembers(members);
+
+                delete apps[uid]; 
+                saveApps(apps);
+
+                loadApplicationsForAdmin();
+                alert(`Player approved and added to the member list!`);
+            }
+        }
+
+        function handleReject(uid) {
+            let apps = getApps();
+            if (apps[uid]) {
+                delete apps[uid]; 
+                saveApps(apps);
+                loadApplicationsForAdmin();
+                alert(`Application has been rejected and deleted.`);
+            }
+        }
+
+        // Feature: Load Members & Allow Admins to Remove
+        function loadMemberDirectory() {
+            const listDiv = document.getElementById('approved-member-list');
+            const members = getMembers();
+            listDiv.innerHTML = '';
+
+            if (members.length === 0) {
+                listDiv.innerHTML = "<p style='color:#aaa; font-size:12px;'>No approved members yet.</p>";
+                return;
+            }
+
+            members.forEach(member => {
+                const item = document.createElement('div');
+                item.className = 'member-item';
+                
+                let removeButton = '';
+                // Only show remove button if an admin is logged in
+                if (isAdminLoggedIn) {
+                    removeButton = `<button class="action-btn btn-remove" onclick="removeMember('${member.uid}')">Remove</button>`;
+                }
+
+                item.innerHTML = `<div>✔ <strong>${member.name}</strong> (UID: ${member.uid})</div> ${removeButton}`;
+                listDiv.appendChild(item);
+            });
+        }
+
+        function removeMember(uid) {
+            if (!confirm("Are you sure you want to remove this member from the guild?")) return;
+            
+            let members = getMembers();
+            // Filter out the member with the matching UID
+            members = members.filter(m => m.uid !== uid);
+            saveMembers(members);
+            
+            loadMemberDirectory(); // Refresh list
+            alert("Member has been removed from the list.");
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            document.getElementById('admin-login-form').style.display = 'block';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('admin-back').style.display = 'block';
+            document.getElementById('admin-pass').value = '';
+            showPage('page-main');
+        }
+
+        // 3. Check Status
+        function checkStatus() {
+            const uid = document.getElementById('status-uid').value;
+            const resultDiv = document.getElementById('status-result');
+            const badge = document.getElementById('badge');
+
+            if (!uid) { alert("Please enter your UID"); return; }
+
+            resultDiv.style.display = 'block';
+            const apps = getApps();
+            const members = getMembers();
+
+            const isMember = members.find(m => m.uid === uid);
+
+            if (isMember) {
+                badge.innerText = "APPROVED";
+                badge.className = "status-badge approved";
+            } else if (apps[uid]) {
+                badge.innerText = "PENDING";
+                badge.className = "status-badge pending";
+            } else {
+                badge.innerText = "REJECTED (Or Not Found)";
+                badge.className = "status-badge rejected";
+            }
+        }
+    </script>
+</body>
+</html>
